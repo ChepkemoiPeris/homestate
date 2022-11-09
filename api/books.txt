@@ -1,0 +1,1 @@
+UPDATE todolist SET status='completed' WHERE id=7
