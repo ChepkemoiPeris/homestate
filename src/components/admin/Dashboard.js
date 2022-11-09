@@ -1,0 +1,52 @@
+import React from 'react'
+
+function Dashboard() {
+  return (
+    <div className="container">
+        <h2>Dashboard</h2>
+    <div className="row text-light">
+        <div className="col-md-4 col-xl-3 ">
+            <div className="card bg-c-blue order-card bg-primary">
+                <div className="card-block">
+                    <h6 className="m-b-20">Orders Received</h6>
+                    <h2 className="text-right"><i className="fa fa-cart-plus f-left"></i><span>486</span></h2>
+                    <p className="m-b-0 text-light">Completed Orders<span className="f-right">351</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <div className="col-md-4 col-xl-3 ">
+            <div className="card bg-c-green order-card bg-success">
+                <div className="card-block">
+                    <h6 className="m-b-20">Orders Received</h6>
+                    <h2 className="text-right"><i className="fa fa-rocket f-left"></i><span>486</span></h2>
+                    <p className="m-b-0 text-light">Completed Orders<span className="f-right">351</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <div className="col-md-4 col-xl-3 ">
+            <div className="card bg-c-yellow order-card bg-warning">
+                <div className="card-block">
+                    <h6 className="m-b-20">Orders Received</h6>
+                    <h2 className="text-right"><i className="fa fa-refresh f-left"></i><span>486</span></h2>
+                    <p className="m-b-0 text-light">Completed Orders<span className="f-right">351</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <div className="col-md-4 col-xl-3 ">
+            <div className="card bg-c-pink order-card bg-danger ">
+                <div className="card-block">
+                    <h6 className="m-b-20">Orders Received</h6>
+                    <h2 className="text-right"><i className="fa fa-credit-card f-left"></i><span>486</span></h2>
+                    <p className="m-b-0 text-light">Completed Orders<span className="f-right">351</span></p>
+                </div>
+            </div>
+        </div>
+	</div>
+</div>
+  )
+}
+
+export default Dashboard
