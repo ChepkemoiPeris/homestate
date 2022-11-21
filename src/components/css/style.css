@@ -223,6 +223,12 @@ a:focus {
 .login-btn:hover{
 color:black !important
 }
+.flex-column a:hover{
+  color: #007bff !important;
+}
+.User_option .btn:hover {
+  color: #000 !important;
+}
 .custom_menu-btn {
   z-index: 9;
   position: absolute;

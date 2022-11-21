@@ -40,9 +40,16 @@
     padding-right: 5px !important;
     margin-right: 45px;
   }
-  .sidebar{
-    display:none
+  .sidebar .nav-name{
+    display:none !important
   }
+  .sidebar i{
+    display:block !important
+  }
+  /* .sidebar .nav-name-small{
+    display:block !important
+    visibility:hidden !important
+  } */
   .custom_menu-btn button span {
     background-color: #0f2480;
   }
@@ -51,7 +58,12 @@
     background-color: #ffffff;
   }
 
-
+  .nearby{
+    width: 100% !important;
+    height: 30vh !important;
+    object-fit: cover !important;
+   
+  }
   .slider_section {
     text-align: center;
   }
@@ -166,6 +178,9 @@
   .bg-image{
     width: 100%;
     height: auto;
+  }
+  .nearby img{
+    width: 70% !important;
   }
   .find_section{
    padding-right: 5px;
@@ -309,8 +324,18 @@
     width: 100%;
     height: auto;
   }
-  .sidebar{
-    display:none
+
+    .nearby img{
+    width: 70%;
+  }
+  .sidebar .nav-name{
+    display:none !important
+  }
+  /* .sidebar .nav-name-small{
+    display:block !important
+  } */
+  .sidebar i{
+    display:block !important
   }
   .find_section{
    padding-right: 5px;
@@ -450,12 +475,18 @@
     height: auto;
     width:auto;
   }
-  .sidebar{
-    display:none
+  .sidebar .nav-name{
+    display:none !important
+  }
+  .sidebar i{
+    display:block !important
   }
   .bg-image{
     width: 100%;
     height: auto;
+  }
+  .nearby img{
+    width: 70%;
   }
   .find_section{
    padding-right: 5px;
@@ -595,12 +626,18 @@
     height: auto;
     width:auto;
   }
-  .sidebar{
-    display:none
+  .sidebar .nav-name{
+    display:none !important
+  }
+  .sidebar i{
+    display:block !important
   }
   .bg-image{
     width: 100%;
     height: auto;
+  }
+  .nearby img{
+    width: 70%;
   }
 .find_section{
  padding-right: 5px;
