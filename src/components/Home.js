@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import image1 from "./images/herobg3.jpg";
-import image4 from "./images/s-1.jpg";
+import image4 from "./images/s-1.jpg"; 
+import $ from 'jquery' 
 
-import $ from 'jquery'
 function Home() {
   const [loading, setLoading] = useState(true);
   const [houses, setHouses] = useState([]);
@@ -12,6 +12,9 @@ function Home() {
   const [searchInput, setSearchInput] = useState('');  
   const [locationid, setLocationId] = useState('');  
   const [locationfdval, setLocationfd] = useState('');
+  const [email, setEmail] = useState('');
+  const [errorMsg,setError] = useState("")
+const [successMsg,setSuccess] = useState("")
   useEffect(() => { 
     const fetchData = async () => {
       setLoading(true); 
@@ -34,7 +37,7 @@ function Home() {
   const handleMoreHouses = (event) => {
     event.preventDefault();
     setNext(next + imagePerRow);
-  };
+  }; 
   const handleClick = (event) => {
     event.preventDefault();
     let val = event.target.innerText;
@@ -74,11 +77,12 @@ function Home() {
       return Object.values(item).join('').toLowerCase().includes(searchInput.toLowerCase())
       }) 
       setHouses(filteredData);
-       
-     
 }
-const handleLocationClick =()=>{
-
+const handleLocationClick =(e)=>{
+  e.preventDefault()
+let val = e.target.innerText 
+let filteredHouses = AllHouses.filter((el) => el.loc_name == val); 
+setHouses(filteredHouses)
 }  
 const handleLocationSearch =(e)=>{
   var val = e.target.value
@@ -88,7 +92,7 @@ const handleLocationSearch =(e)=>{
     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
   });
 }   
-
+  
 function autocompleteMatch(input) {
   input = input.toLowerCase();
   if (input == '') {
@@ -103,7 +107,7 @@ function autocompleteMatch(input) {
   });
 }
 function showResults(e) {
-  let val = e.target.value
+  let val = e.target.value 
   let res = document.getElementById("result");  
   res.innerHTML = '';
   let list = '';
@@ -114,10 +118,9 @@ function showResults(e) {
   res.innerHTML = '<ul id="myList">' + list + '</ul>';    
   document.getElementById("myList").style.listStyle="none";
   document.getElementById("myList").style.color="#fff"; 
-  const listItems = document.querySelectorAll('.listVal');
+  const listItems = document.querySelectorAll('.listVal'); 
   listItems.forEach(list => {
-    list.addEventListener('click', function handleClick(event) {
-        console.log(event.target.id); 
+    list.addEventListener('click', function handleClick(event) { 
         let val = event.target.innerText; 
         setLocationfd(event.target.id)
         setLocationId(val) 
@@ -126,20 +129,98 @@ function showResults(e) {
   });
   
 }
+ 
 const Subscribe = async (e)=>{ 
     e.preventDefault();   
   var all = document.forms.subscribe_form;     
 	var fd = new FormData(all);    
 	let email = fd.get('email');
 	let location = fd.get('location'); 
+  setEmail(email)
   let url ="http://localhost:5000/subscribers/create"
   let res = await axios.post(url, {
     email:email,
     location_id:locationfdval
-  })  
-  console.log(res.data) 
+  })   
+    let status =res.data.status  
+    if(status == 'error'){
+   const element = document.querySelector('.alert');
+   element.style.display = 'block';
+   let msg = res.data.message
+   let html = `<a href="#" id="unsubscribe" className="text-primary" role="button">Unsubscribe</a>`    
+   let result = msg.replace("Unsubscribe", html); 
+    element.innerHTML = `${result}`
+    let el = document.getElementById("unsubscribe")
+    el.addEventListener('click', function handleClick(event) {
+      event.preventDefault() 
+      document.getElementById("backdrop").style.display = "block"
+      document.getElementById("exampleModal").style.display = "block"
+      document.getElementById("exampleModal").classList.add("show")
+  });
+    if(typeof(res.data.message)=="object"){            
+       setError(res.data.message[0].msg)
+    }else{
+       setError(result)
+    } 
+  }else{ 
+       setSuccess(res.data.message)
+       const el = document.querySelector('.alert');
+       el.style.display = 'none';
+      const element = document.querySelector('.created');
+      element.style.display = 'block'; 
+      document.getElementById("subscribe_form").reset();
+      document.getElementById("subscribe_form").style.display ="none";  
+     setTimeout(() => {
+      element.style.display = 'none'; 
+      document.getElementById("subscribe_form").style.display ="block";
+     }, 3000);
+   
+  }
 }
-
+function closeModal() {
+  document.getElementById("backdrop").style.display = "none"
+  document.getElementById("exampleModal").style.display = "none"
+  document.getElementById("exampleModal").classList.remove("show")
+}
+var modal = document.getElementById('exampleModal');
+const handleUnsubscribe=async ()=>{
+  
+  let url ="http://localhost:5000/subscriber/delete/"+email
+  let res = await axios.delete(url)   
+  let status =res.data.status   
+  if(status == 'error'){
+    const element = document.querySelector('.alert');
+    element.style.display = 'block';
+    let msg = res.data.message 
+     element.innerHTML = `${msg}` 
+     if(typeof(res.data.message)=="object"){            
+        setError(res.data.message[0].msg)
+     }else{
+        setError(msg)
+     } 
+   }else{ 
+        setSuccess(res.data.message)
+       const element = document.querySelector('.created');
+       element.style.display = 'block';
+       document.getElementById("backdrop").style.display = "none"
+       document.getElementById("exampleModal").style.display = "none"
+       document.getElementById("exampleModal").classList.remove("show")
+       const el = document.querySelector('.alert');
+       el = 'none'; 
+      //  el.innerHTML = ``
+      document.getElementById("subscribe_form").reset();  
+      setTimeout(() => {
+       element.style.display = 'none';  
+      }, 4000);
+    
+   }
+}
+ 
+window.onclick = function(event) {
+  if (event.target == modal) {
+    closeModal()
+  }
+}
   return (
     <div>
       <div className="hero_area">
@@ -169,8 +250,8 @@ const Subscribe = async (e)=>{
                 <ul className="navbar-nav">
                   <div className="User_option">
                     <li className="nav-item">
-                      <a className="nav-link" href={"#"}>
-                        {" "}
+                      <a className="nav-link" href={"/browse/locations"}> 
+                      
                         Browse Locations
                       </a>
                     </li>
@@ -179,6 +260,7 @@ const Subscribe = async (e)=>{
                       type="button"
                       role="button"
                       className="btn btn-outline-primary text-primary login-btn"
+                      
                     >
                       Login/Sign up
                     </a>
@@ -202,7 +284,7 @@ const Subscribe = async (e)=>{
                     An easy way to find CLASSY apartments for Rent in Nairobi
                   </p>
                   <div className="btn-box">
-                    <a href="" className="">
+                    <a href="#sale_section" className="">
                       Explore
                     </a>
                   </div>
@@ -259,7 +341,7 @@ const Subscribe = async (e)=>{
           </form>
         </div>
       </section>
-      <section className="sale_section layout_padding-bottom">
+      <section id="sale_section" className="sale_section layout_padding-bottom">
         <div className="container-fluid">
           <div className="row">
             <div className="sidebar">
@@ -322,7 +404,7 @@ const Subscribe = async (e)=>{
                             <a
                               href="#"
                               style={{ textDecoration: "none", color: "#000" }}
-                              onClick={handleLocationClick}
+                              onClick={handleLocationClick} 
                             >
                               {e}
                             </a>
@@ -371,7 +453,11 @@ const Subscribe = async (e)=>{
                               </span>
                               <h6 style={{fontSize:"13px"}}>{e.name}</h6>
                               <p>{e.description}</p>
-                              
+                              <a href={"/house/details/"+e.id} className="btn mr-2 text-primary">
+                                      <i className="fas fa-link text-dark"></i> More
+                                      details
+                                    </a>
+                                   
                             </div>
                           </div>
                         );
@@ -396,6 +482,7 @@ const Subscribe = async (e)=>{
           </div>
         </div>
       </section>
+       
       <section className="sale_section layout_padding-bottom">
         <div className="container-fluid">
           <div className="heading_container">
@@ -403,7 +490,8 @@ const Subscribe = async (e)=>{
           </div>
           <div className="sale_container">
             {loading ? "Loading" : uniqueLocations.map((e, index) => {
-                  return (
+                let url= '/location/'+e
+                 return (
                     <div className="box" key={index}>
                       <div className="img-box">
                         <img src={image4} alt="" />
@@ -411,9 +499,9 @@ const Subscribe = async (e)=>{
                       <div className="detail-box">
                         <h6>{e}</h6>
                         <p>
-                          There are many variations of passages of Lorem Ipsum
-                          available, but
+                         Explore different houses around {e}
                         </p>
+                        <a href={url} class="btn btn-primary">Explore</a>
                       </div>
                     </div>
                   );
@@ -431,7 +519,33 @@ const Subscribe = async (e)=>{
           <br />
           Subscribe if you want to be notified of new listings in your location
         </span>
-
+        <div className="alert alert-danger" style={{display:"none"}}  role="alert">
+                 {/* {errorMsg} */}
+                 </div>
+                 <div className="created alert alert-success " style={{display:"none"}}  role="alert">
+                 {successMsg}
+         </div>
+         <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-modal="true"
+    role="dialog">
+    <div className="modal-dialog" role="document">
+        <div className="modal-content">
+            <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Are you sure?</h5>
+                <button type="button" className="close" aria-label="Close" onClick={closeModal}>
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div className="modal-body">
+                You are about to Unsubscribe.Do you want to proceed?
+            </div>
+            <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={closeModal}>No</button>
+                <button type="button" className="btn btn-danger" onClick={handleUnsubscribe}>Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div className="modal-backdrop fade show" id="backdrop" style={{display: "none"}}></div> 
         <form onSubmit={Subscribe} id="subscribe_form" autoComplete="off">
           <div className="form-group row form-sub">
             <div className="col-md-4 mb-5">
