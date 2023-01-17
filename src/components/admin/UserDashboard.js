@@ -13,6 +13,12 @@ const handleSubmit = async(e) =>{
  e.preventDefault() 
  let fd = e.target
 let files =e.target.image.files
+console.log(files.length)
+if(files.length == 0){ 
+  setError("Please upload your ID");
+  
+}
+console.log(errorMsg)
 var formData = new FormData();
 for (const key of Object.keys(files)) {
   formData.append('realtor_id', files[key])

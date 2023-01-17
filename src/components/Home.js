@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import image1 from "./images/herobg3.jpg";
-import image4 from "./images/s-1.jpg"; 
+import loc1 from "./images/s-1.jpg"; 
+import loc2 from "./images/d-1.jpg"; 
+import loc3 from "./images/herobg5.jpg"; 
 import $ from 'jquery' 
 
 function Home() {
@@ -12,6 +14,7 @@ function Home() {
   const [searchInput, setSearchInput] = useState('');  
   const [locationid, setLocationId] = useState('');  
   const [locationfdval, setLocationfd] = useState('');
+  const [trending, setTrending] = useState([]);
   const [email, setEmail] = useState('');
   const [errorMsg,setError] = useState("")
 const [successMsg,setSuccess] = useState("")
@@ -24,14 +27,18 @@ const [successMsg,setSuccess] = useState("")
         const locs = await axios.get(
           "http://localhost:5000/locations"
         ); 
-        setHouses(response.data);
+        const trending = await axios.get(
+          "http://localhost:5000/trending/locations"
+        ); 
+      let hse = response.data.filter(e=>e.reviewed != 0)
+        setHouses(hse);
         setAll(houses);  
         setLocations(locs.data.data);  
+        setTrending(trending.data.data);  
         setLoading(false);  
     };
     fetchData();    
-  }, []);
-   
+  }, []); 
   const imagePerRow = 6;
   const [next, setNext] = useState(imagePerRow);
   const handleMoreHouses = (event) => {
@@ -276,8 +283,8 @@ window.onclick = function(event) {
               <div className="col-md-4 offset-md-1">
                 <div className="detail-box">
                   <h1>
-                    <span> Modern</span> <br />
-                    Apartments <br />
+                    <span>Find </span> <br />
+                    Apartments to<br />
                     Rent
                   </h1>
                   <p>
@@ -421,7 +428,7 @@ window.onclick = function(event) {
                 House hunting made easy. Browse houses you want in your location
                 </p>
               </div>
-              <div className="sale_container">
+              <div className="">
                 <div className="row">
                   {loading
                     ? "Loading..."
@@ -432,33 +439,46 @@ window.onclick = function(event) {
                             "http://localhost:5000/rentals/image?file=" +
                             e.image;
                         }
-                        return (
-                          <div className="box" key={index}>
-                            <div className="img-box">
-                              <img
-                                src={imagesrc}
-                                alt={e.name}
-                                width="191px"
-                                height="123px"
-                              />
-                              <div className="top-right">
-                                <button className="text-primary ">
-                                  {e.bedrooms}
-                                </button>
-                              </div>
-                            </div>
-                            <div className="detail-box">
-                              <span>
-                                {e.loc_name},{e.sub_name}
-                              </span>
-                              <h6 style={{fontSize:"13px"}}>{e.name}</h6>
-                              <p>{e.description}</p>
-                              <a href={"/house/details/"+e.id} className="btn mr-2 text-primary">
-                                      <i className="fas fa-link text-dark"></i> More
-                                      details
-                                    </a>
-                                   
-                            </div>
+                        return ( 
+                      <div className="col-md-4 col-sm-12 mb-2 d-flex" key={index}> 
+                      <div className="card h-100">
+                        <img
+                          src={imagesrc}
+                          alt={e.name}
+                          style={{
+                            width: "100%",
+                            height: "15vw",
+                            objectFit: "cover"
+                          }}
+                          className="card-img-top nearby"
+                        />
+                        <div className="card-img-overlay"  style={{ height: "100px"}}>
+                          <button
+                            className="text-primary float-right"
+                            style={{ border: "none", borderRadius: "12px" }}
+                          >
+                            {e.bedrooms}
+                          </button>
+                        </div>
+                        <div className="card-body ">
+                          <h5 className="card-title">{e.name}</h5>
+                          <p className="card-text">{e.description}</p>                          
+                          <a
+                            href={"/house/details/" + e.id}
+                            role="button"
+                            className="btn mr-2 text-primary"
+                          >
+                             <i className="fas fa-link text-dark"></i>
+                          More details
+                          </a> 
+                          <p className="card-text">
+                            <small className="text-muted"> 
+                              {e.loc_name}, {e.sub_name}
+                            </small>
+                          </p>
+                        </div>
+                      </div> 
+                           
                           </div>
                         );
                       })}
@@ -489,18 +509,24 @@ window.onclick = function(event) {
             <h2>Explore trending Locations</h2>
           </div>
           <div className="sale_container">
-            {loading ? "Loading" : uniqueLocations.map((e, index) => {
-                let url= '/location/'+e
+            {loading ? "Loading" : trending.map((e, index) => { 
+                let url= '/location/'+e.loc_name
                  return (
                     <div className="box" key={index}>
                       <div className="img-box">
-                        <img src={image4} alt="" />
+                      
+                       {index == 0 ? <img src={loc1} alt="" /> : index == 1 ? <img src={loc2} alt="" width={250} height ={230}/>: <img src={loc3} alt="" width={250} height ={230}/>} 
                       </div>
                       <div className="detail-box">
-                        <h6>{e}</h6>
+                        <h6>{e.loc_name}</h6>
                         <p>
-                         Explore different houses around {e}
+                         Explore different houses around {e.loc_name}
                         </p>
+                        <p className="card-text">
+                            <small className="text-muted"> 
+                             {e.count} Houses listed
+                            </small>
+                          </p>
                         <a href={url} class="btn btn-primary">Explore</a>
                       </div>
                     </div>

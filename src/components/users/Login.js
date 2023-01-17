@@ -1,21 +1,36 @@
-import React,{useState,createContext } from 'react'
+import React,{useState,useEffect } from 'react'
 import axios from 'axios'
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate,useLocation } from "react-router-dom"; 
 import logo from "../images/logofinal.PNG"; 
-import Nav from "../nav"; 
-import Protected from '../Protected';
+import Nav from "../nav";  
  
 function Login({message}) {
-const navigate = useNavigate();
+const navigate = useNavigate(); 
+const location = useLocation();  
 const [errorMsg,setError] = useState("")
-const [successMsg,setSuccess] = useState("") 
-const [user, setUser] = useState()
- if(message){
-  setTimeout(() => {
-    const element = document.querySelector('.message');
-    element.style.display = 'none';
-  }, 5000)
- }
+const [successMsg,setSuccess] = useState("")  
+const [verifySuccess,setVerifySuccess] = useState("")  
+const [verifyFailed,setverifyFailed] = useState("")  
+const [verify_email,setEmail] = useState("")
+useEffect(() => {  
+if(location.state){
+  if(location.state.message =="Email for verification sent.Please Verify your Email to continue!"){
+    setEmail(location.state.message)
+    let el = document.getElementById("verify_email")
+    setTimeout(() => {
+       el.style.display = "none" 
+    }, 3000); 
+    }else{
+      setverifyFailed(location.state.message) 
+      setTimeout(() => {
+        const element = document.getElementById('message');
+        element.style.display = 'none';
+      }, 9000)
+    }
+}
+}, [])
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();  
         var all = document.forms.loginForm;     
@@ -44,13 +59,13 @@ const [user, setUser] = useState()
                 setSuccess(res.data.message) 
                 let valData =  res.data.data  
                localStorage.setItem('user', JSON.stringify(valData))
-                localStorage.setItem('token', res.data.token)
+               localStorage.setItem('token', res.data.token)
                localStorage.setItem('login', true)
-                const element = document.querySelector('.created');
+                const element = document.querySelector('.created'); 
                 element.style.display = 'block';
                 setTimeout(() => {
                     navigate("/home");
-                  }, 3000);          
+              }, 3000);          
            
            }
         
@@ -60,20 +75,40 @@ const [user, setUser] = useState()
     <div className="sign-container">
         <div className="signin-content"> 
         <Nav/> 
+        {verify_email ? <div
+             className="verify_email alert alert-success "
+              style={{ display: "block" }}
+              role="alert"
+            >
+              {verify_email}
+            </div>:<div
+             className="alert alert-success "
+              style={{ display: "none" }}
+              role="alert"
+            >
+              {verify_email}
+            </div>}
         <div className="signin-form">
-            {message ?  <div
+          {verifyFailed ? <div
+              id="message"
               className="message alert alert-danger"
               style={{ display: "block" }}
               role="alert"
             >
-              {message}
+              {verifyFailed}
+            </div>:verifySuccess ? <div
+             className="verified alert alert-success "
+              style={{ display: "block" }}
+              role="alert"
+            >
+              {verifySuccess}
             </div>:<div
-              className="alert alert-danger"
+             className="verified alert alert-success "
               style={{ display: "none" }}
               role="alert"
             >
-              {message}
-            </div>}
+              {verifySuccess}
+            </div>}   
             <div
               className="alert alert-danger"
               style={{ display: "none" }}
@@ -184,7 +219,7 @@ const [user, setUser] = useState()
                   Cancel
                 </a>
                 <p>
-                <a href={"/forgot"} className="signup-image-link mr-3">
+                <a href={"/forgot_password"} className="signup-image-link mr-3">
                   Forgot Password
                 </a>
                 <a href={"/register"} className="signup-image-link">Create an account</a>

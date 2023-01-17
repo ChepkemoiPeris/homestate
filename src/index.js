@@ -11,18 +11,11 @@ import HouseDetails from "./components/houses/HouseDetails";
 import BrowseLocations from "./components/BrowseLocations";
 import Welcome from "./components/admin/Welcome";
 import AddHouse from "./components/admin/houses/AddHouse";
-// import ForgotPassword from './components/users/ForgotPassword';
-// import All from './components/admin/houses/All';
-//import AdminDash from './components/admin/Dashboard/AdminDash';
-// import User from './components/admin/Dashboard/Users/User';
-// import Icons from './components/admin/Dashboard/Icons';
-// import Table from './components/admin/Dashboard/Users/Table';
-// import Typography from './components/admin/Dashboard/Typography';
-// import Notifications from './components/admin/Dashboard/Notifications';
-// import Houses from './components/admin/Dashboard/Houses/Houses';
-import Protected from "./components/Protected";
-import Profile from "./components/Profile"; 
+import ForgotPassword from './components/users/ForgotPassword';
+import Reset from "./components/admin/users/Reset";    
+import Protected from "./components/Protected"; 
 import Account from "./components/admin/users/Account";
+import Verify from "./components/admin/users/Verify";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render( 
@@ -35,9 +28,9 @@ root.render(
         <Route path="/house/details/:id" element={<HouseDetails />} />
         <Route path="/browse/locations" element={<BrowseLocations />} />
         <Route path="login" element={<Login />} />
-        <Route path="/houses/add/:id" element={<AddHouse />} />
-        {/* <Route path="/old/home" element={<AdminDash />} /> */}
+        <Route path="/houses/add/:id" element={<AddHouse />} /> 
         <Route path="/profile" element={<Account />} />
+        <Route path="/reset/:token/:id" element={<Reset />} />
         <Route path='/home'
          element={
            <Protected isLoggedIn={localStorage.getItem("user")} token={localStorage.getItem("token")}>
@@ -45,14 +38,16 @@ root.render(
            </Protected>
          }
        />
+          
+       <Route path="/verify/:email" element={<Verify />} /> 
+       <Route path="/forgot_password" element={<ForgotPassword />} />   
         {/* <Route path="/houses" element={<Houses />} />  
           <Route path="/user/:userId" element={<User />} /> */}
         {/* <Route path="/user" element={<User />} /> */}
         {/* <Route path="/icons" element={<Icons />} />
           <Route path="/users" element={<Table />} />
           <Route path="/typography" element={<Typography />} /> 
-          <Route path="/notifications" element={<Notifications />} />            
-          <Route path="/forgotpassword" element={<ForgotPassword />} />                  */}
+          <Route path="/notifications" element={<Notifications />} />                     */}
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

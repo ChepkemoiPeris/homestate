@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"; 
 import { useNavigate } from "react-router-dom"; 
+import axios from 'axios'
 import Dashboard from "./Dashboard"; 
 import Table from "./users/Table";
 import Houses from "./houses/Houses"
@@ -12,9 +13,10 @@ import ChangePassword from "./users/ChangePassword";
 import "./dist/css/bootstrap.min.css"
 import User from "./UserDashboard";
 import Reports from "./Reports";
-function Welcome({details}) { 
+function Welcome({details}) {  
   const navigate = useNavigate();
   const [user,setUser] = useState()
+  const [notifications,setNotifications] =useState([])
   useEffect(() => {
     const loggedInUser = localStorage.getItem("user");  
     const token = localStorage.getItem("token"); 
@@ -34,8 +36,16 @@ function Welcome({details}) {
       "http://localhost:5000/rentals/image?file=" +
       user.image;
    role = user.role
-   
+   async function fetchNotification(){
+    let url = 'http://localhost:5000/notifications/'+user_id 
+    let res = await axios.get(url) 
+    if(res.data.status == "success"){
+     setNotifications(res.data.data) 
+    }
+   }   
+   fetchNotification() 
   }
+  
   const [display,setDisplay] = useState(<Dashboard />) 
   if(role == "user"){
     let hide = document.querySelector('.flex-column')
@@ -66,8 +76,7 @@ function Welcome({details}) {
     }else if(val== 'Contact'){
         el=document.getElementById('contact')
         setDisplay(<Contact />)
-    }else if(val== 'Notifications '){ 
-      console.log("val")
+    }else if(val== 'Notifications '){  
         el=document.getElementById('notifications')       
         setDisplay(<Notifications id={user_id}/>)
     }else if(val=="Locations"){
@@ -89,7 +98,7 @@ function Welcome({details}) {
     e.preventDefault()  
     localStorage.clear();
     navigate("/login");
-  };
+  }; 
   return (
     <div className="container-fluid ml-3 p-5">    
        <nav className="navbar navbar-expand-lg navbar-light fixed-top flex-md-nowrap p-0 shadow"  style={{backgroundColor: "#eee"}}>
@@ -140,7 +149,7 @@ function Welcome({details}) {
   right: "-10px",
   padding: "5px 8px",
   borderRadius: "50%", 
-  fontSize:"12px" }}>3</span>
+  fontSize:"12px" }}>{notifications.length}</span>
         </i>
       {/* <h5 className="pt-3 text-primary">{f_name}</h5> */}
         <li className="nav-item dropdown mr-5">
@@ -225,7 +234,7 @@ function Welcome({details}) {
                 <a className="nav-link" href="#" style={{color: "#333"}} onClick={handleClick}>
                 <i className="far fa-bell pr-2"><span className="sr-only">Notifications</span></i> 
                 <span className="nav-name">Notifications </span>   
-                <span className="badge badge-danger">4</span>
+                <span className="badge badge-danger">{notifications.length}</span>
                 </a>
               </li>
               <li className="nav-item p-1">

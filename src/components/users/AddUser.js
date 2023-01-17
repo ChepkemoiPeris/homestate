@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import "../fonts/material-icon/css/material-design-iconic-font.min.css";
 import logo from "../images/logofinal.PNG";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Navigate,useNavigate } from "react-router-dom";
 import Nav from "../nav";
+import Login from "./Login";
 function AddUser() {
   const navigate = useNavigate();
   const [errorMsg, setError] = useState("");
@@ -33,15 +34,7 @@ function AddUser() {
       date_created: current_date,
       role: 1,
     }; 
-    let res = await axios.post(
-      "http://localhost:5000/users/create",
-      post_data,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+  c
     let status = res.data.status;
     if (status == "error") {
       const el = document.querySelector(".alert");
@@ -61,11 +54,27 @@ function AddUser() {
       setSuccess(res.data.message);
       const element = document.querySelector(".created");
       element.style.display = "block";
-      setTimeout(() => {
-        navigate("/login");
-      }, 3000);
+
+      let resp = await axios.post(
+        "http://localhost:5000/sendmail", 
+        {
+          type:"verify",
+          name:fname,
+          email:email
+        }
+      ); 
+      if(resp.data){
+        let status = resp.data.status
+        if(status == "success"){
+          return navigate("/login", { state: { message: "Email for verification sent.Please Verify your Email to continue!" } })
+         
+              }
+      }
+      
+    
+     
     }
-  };
+  }; 
   return (
     <section className="signup">
       <Nav/>

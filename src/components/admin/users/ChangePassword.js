@@ -5,10 +5,7 @@ function ChangePassword({user}) {
     const [errorMsg, setError] = useState("");
   const [successMsg, setSuccess] = useState("");
  const handleSubmit = async(e)=>{
-e.preventDefault()
-let current = e.target.current.value
-let new_pass = e.target.new.value
-let repeat = e.target.repeat.value 
+e.preventDefault() 
 let url ='http://localhost:5000/users/change_password/'+user
 let res = await axios.post(url,{
     current:e.target.current.value,
@@ -69,7 +66,7 @@ if(res.data.status == "success"){
                                     <label htmlFor="inputPasswordNew">New Password</label>
                                     <input type="password" className="form-control" id="inputPasswordNew" name="new" required=""/>
                                     <span className="form-text small text-muted">
-                                            The password must be 8-20 characters, and must <em>not</em> contain spaces.
+                                            The password must be 6-20 characters, and must <em>not</em> contain spaces.
                                         </span>
                                 </div>
                                 <div className="form-group">

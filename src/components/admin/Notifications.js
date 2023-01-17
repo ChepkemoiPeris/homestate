@@ -4,7 +4,8 @@ import axios from 'axios'
 function Notifications({id}) {  
      const [notifications,setNotifications] = useState([])
      const [loading,setLoading] = useState(true)
-     const fetchData = async() =>{
+     useEffect(() => {
+        const fetchData = async() =>{
             let url = 'http://localhost:5000/notifications/'+id 
            let res = await axios.get(url) 
            if(res.data.status == "success"){
@@ -14,7 +15,15 @@ function Notifications({id}) {
           
         }
         fetchData() 
-         
+     }, [])
+    
+  const handleClick = (e)=>{ 
+    let val = e.target.id    
+    let filtered = notifications.filter(e=>{
+       return e.id == val
+    })
+    console.log(filtered)
+  }       
   return (
     <div className="wrapper"> 
     <div className="main-panel">  
@@ -32,16 +41,19 @@ function Notifications({id}) {
                                 <h5>
                                     <small>Notifications </small>
                                 </h5> 
-                                {(!loading) ? notifications.map(e=>{ 
+                                {(!loading) ? notifications.map(e=>{  
+                                    
                                     //  if(e.viewed == 0){
                                     //     console.log("zero")
                                     //  }
                                     return(
-                                        <div className="alert alert-info">
+                                        <div className="alert alert-info" key={e.id}>
+
                                         <button type="button" aria-hidden="true" className="close" data-dismiss="alert">
                                         <i className="fa fa-times"></i>
                                         </button>
-                                        <span>{e.tittle}.</span>
+                                        <span onClick={handleClick}><em><i id={e.id}  class="fas fa-info-circle"></i></em></span>&nbsp;
+                                        <span >{e.title}</span>
                                     </div>
                                     )
                                 }):"Loading"}
