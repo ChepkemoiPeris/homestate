@@ -5,6 +5,7 @@ const houses = require("../controllers/houses.js")
 const subscribers = require("../controllers/subscribers.js")
 const locations = require("../controllers/location.js")
 const notifications =require("../controllers/notifications")
+const mail =require("../controllers/sendMail")
 const router = express.Router(); 
 const path = require('path');
 const multer = require("multer"); 
@@ -81,6 +82,7 @@ router.route("/subscriber/delete/:email").delete(subscribers.deleteSubscriber);
 
 router.route("/locations").get(locations.getLocations) 
 router.route("/sublocation").get(locations.getSublocations) 
+router.route("/trending/locations").get(locations.getTrendingLocation) 
  //users
  router.route("/users/list").get(users.getAllUsers)  
  router.route("/users/change_password/:id").post(users.changePassword) 
@@ -106,7 +108,7 @@ router.route("/sublocation").get(locations.getSublocations)
    .isLength({ min: 3 }),
    body('phone',"The name must be of minimum 9 characters length")
    .notEmpty()
-   .escape()
+   .escape() 
    .trim()
    .isLength({ min: 9 }),
    body('email',"Invalid email address")
@@ -120,7 +122,12 @@ router.route("/sublocation").get(locations.getSublocations)
  router.route("/user/update/:id").put(users.updateUser)
  router.route("/user/delete/:id").delete(users.deleteUser) 
 router.route("/verify_token").post(users.VerifyToken)
-
+router.route("/verify_user/:email").post(users.verifyUser)
+router.route("/reset/:email").post(users.resetPassword)
+router.route("/realtors/list").get(users.getRealtors)
 //notifications
 router.route("/notifications/:id").get(notifications.getNotification) 
+
+//send mail
+router.route("/sendmail").post(mail.sendMail)
 module.exports = router;

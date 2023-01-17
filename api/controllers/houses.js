@@ -4,7 +4,7 @@ var fs = require('fs');
 const multer = require("multer");
 const path = require('path');
  exports.getAllHouses = (req, res, next) => {
-  let sql = "SELECT houses.*,users.first_name,users.last_name,users.email, location.name AS loc_name,sublocation.name as sub_name FROM houses INNER JOIN location ON houses.location_id = location.id INNER JOIN sublocation ON houses.sublocation = sublocation.id INNER JOIN users ON houses.user_id = users.id "
+  let sql = "SELECT houses.*,users.first_name,users.last_name,users.email, location.name AS loc_name,sublocation.name as sub_name FROM houses INNER JOIN location ON houses.location_id = location.id INNER JOIN sublocation ON houses.sublocation = sublocation.id INNER JOIN users ON houses.user_id = users.id"
        
   conn.query(sql, function (err, data, fields) {
       if(err) return next(new AppError(err))
@@ -60,11 +60,11 @@ const path = require('path');
    };
  
    exports.updateHouse = (req, res, next) => {
-    let status = req.body.status     
+    let status = 1  
     if (!req.params.id) {
       return next(new AppError("No House id found", 404));
     }
-    let update = `UPDATE houses SET status='${status}' WHERE id=${req.params.id}`
+    let update = `UPDATE houses SET reviewed='${status}' WHERE id=${req.params.id}`
       
     conn.query(
       update,

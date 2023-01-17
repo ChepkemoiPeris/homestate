@@ -27,9 +27,10 @@ function AddHouse() {
   }, []) 
   const user = JSON.parse(localStorage.getItem("user"));
  
-const handleLocation =(event)=>{  
-  let filtered = subLoc.filter(e=> e.location_id == event.target.value) 
-   setFilteredLocs(filtered)
+const handleLocation =(event)=>{    
+  let filtered = subLoc.filter(e=> e.loc_id == event.target.value) 
+   setFilteredLocs(filtered)   
+  
 } 
       const handleSubmit = async (e) => {
         e.preventDefault();   
@@ -87,7 +88,7 @@ const handleLocation =(event)=>{
         const hideEl = document.querySelector(".card-outline-secondary"); 
         showEl.style.display = "block";
         hideEl.style.display = "none"; 
-      } 
+      }  
       return (
         <div>
         <div className="card card-outline-secondary">
@@ -119,8 +120,8 @@ const handleLocation =(event)=>{
                 <div className="form-group"> 
                       <label htmlFor="sublocation">Ward</label>
                       <select className="form-control" name="sublocation" id="sublocation" required>
-                     {filteredLocs ? filteredLocs.map(e=>{
-                       return(<option value={e.id}>{e.name}</option>)
+                     {(filteredLocs) ? filteredLocs.map(e=>{
+                       return(<option value={e.id}>{e.ward}</option>)
                      }) : <option></option>}   
                         
                       </select>
@@ -198,7 +199,8 @@ const handleLocation =(event)=>{
                 </button>
             </div>
             <div className="modal-body">
-               Do you want to add more Images ?You can also add later
+               
+               Do you want to add more Images ?You can also add later 
             </div>
             <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={closeModal}>No</button>

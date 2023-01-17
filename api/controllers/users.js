@@ -43,8 +43,7 @@ exports.createUser = async (req, res, next) => {
     req.body.last_name,
     req.body.phone,
     hashPass,
-    req.body.date_created,
-    req.body.role,
+    req.body.date_created, 
     imgsrc,
   ];
   try {
@@ -60,13 +59,14 @@ exports.createUser = async (req, res, next) => {
           });
         } else {
           conn.query(
-            "INSERT INTO users (email, first_name,last_name,phone,password,date_created,role,image) VALUES(?)",
+            "INSERT INTO users (email, first_name,last_name,phone,password,date_created,image) VALUES(?)",
             [values],
             function (err, data, fields) {
               if (err) return next(new AppError(err, 500));
               res.status(201).json({
                 status: "success",
                 message: "User Registered successfully! ",
+                data:data
               });
             }
           );
@@ -95,7 +95,46 @@ exports.getUser = (req, res, next) => {
     }
   );
 };
-
+exports.resetPassword = (req, res, next) => { 
+  conn.query(
+    "SELECT * FROM users WHERE email= ?",
+    [req.params.email],
+    function (err, data, fields) {
+      if (err) return next(new AppError(err, 500));
+      if(data.length > 0){
+        generateToken(data[0])         
+      }else{
+        return res.status(201).json({
+          status: "error",
+          message: "No user with that email found!" 
+      })
+     
+    }
+    function generateToken(data){ 
+      var tokenObject = {
+        email: data.email,
+        id: data.id
+    };
+    let user_id = data.id
+     var secret ="my-password-reset-token"
+     const token = jwt.sign(tokenObject,secret, {
+      expiresIn: "1200s",
+    }); 
+     if(token){
+      let update = `UPDATE users SET reset_password_token='${token}' WHERE id=${data.id}`;
+      conn.query(update, function (err, data, fields) {
+        if (err) return next(new AppError(err, 500));
+       return res.status(201).json({
+          status: "success",
+          user_id:user_id,
+          token:token 
+        });
+      }); 
+     } 
+    }
+  }
+  );
+};
 exports.Login = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -137,7 +176,7 @@ exports.Login = (req, res, next) => {
       if (Verified == 0) {
         return res.status(201).json({
           status: "error",
-          message: "Please verify your email",
+          message: "Please verify your email to continue",
         });
       }
       if (Active == 0) {
@@ -148,7 +187,7 @@ exports.Login = (req, res, next) => {
       }
 
       const theToken = jwt.sign({ id: data[0].id }, "my-house-listings-token", {
-        expiresIn: "5h",
+        expiresIn: "12h",
       });
       return res.json({
         status: "success",
@@ -163,30 +202,18 @@ exports.Login = (req, res, next) => {
 };
 
 exports.changePassword = (req, res, next) => {
-  conn.query(
-    "SELECT * FROM `users` WHERE `id`=?",
-    [req.params.id],
-    function (err, data, fields) {
-      if (err) return next(new AppError(err));
-      if (data.length > 0) {
-        checkData(data);
-      } else {
-        return res.status(201).json({
-          status: "error",
-          message: "User not found!!",
-        });
-      }
-    }
-  );
   const checkData = async (data) => {
     let length = req.body.new_pass.length;
-    const passMatch = await bcrypt.compare(req.body.current, data[0].password);
-    if (!passMatch) {
-      return res.status(201).json({
-        status: "error",
-        message: "Incorrect Current Password",
-      });
-    }
+    if(data != "verify"){
+      const passMatch = await bcrypt.compare(req.body.current, data[0].password);
+      if (!passMatch) {
+        return res.status(201).json({
+          status: "error",
+          message: "Incorrect Current Password",
+        });
+      }
+    } 
+    
     if (length < 6) {
       return res.status(201).json({
         status: "error",
@@ -209,6 +236,30 @@ exports.changePassword = (req, res, next) => {
       });
     });
   };
+  if(req.body.token){
+    const decode = jwt.verify(req.body.token, "my-password-reset-token");  
+    if(decode.email){
+      data = "verify"
+      checkData(data)
+      return
+    } 
+  }
+  conn.query(
+    "SELECT * FROM `users` WHERE `id`=?",
+    [req.params.id],
+    function (err, data, fields) {
+      if (err) return next(new AppError(err));
+      if (data.length > 0) {
+        checkData(data);
+      } else {
+        return res.status(201).json({
+          status: "error",
+          message: "User not found!!",
+        });
+      }
+    }
+  );
+
 };
 
 exports.updateUser = (req, res, next) => {
@@ -225,6 +276,36 @@ exports.updateUser = (req, res, next) => {
       message: "User updated!",
     });
   });
+};
+exports.verifyUser = (req, res, next) => {
+  let email = req.params.email; 
+  conn.query(
+    "SELECT * FROM `users` WHERE `email`=?",
+    [req.params.email],
+    function (err, data, fields) {
+      if (err) return next(new AppError(err));
+      if (data.length > 0) {
+        let update = `UPDATE users SET verified=1,active = 1 WHERE email='${req.params.email}'`;
+
+  conn.query(update, function (err, data, fields) {
+    if (err) return next(new AppError(err, 500));
+   return res.status(201).json({
+      status: "success",
+      message: "User updated!",
+    });
+  });
+      } else {
+        return res.status(201).json({
+          status: "error",
+          message: "User not found!!",
+        });
+      }
+    }
+  );
+  if (!req.params.email) {
+    return next(new AppError("No User id found", 404));
+  }
+ 
 };
 exports.deleteUser = (req, res, next) => {
   if (!req.params.id) {
@@ -271,7 +352,7 @@ exports.uploadId = (req, res, next) => {
       if (data.length > 0) {
         return res.status(201).json({
           status: "error",
-          message: "Requests already sent",
+          message: "Request already sent",
         });
       } else {
         let sqlquery = (cb) => {
@@ -329,3 +410,15 @@ exports.uploadId = (req, res, next) => {
     }
   );
 };
+exports.getRealtors = (req,res,next)=>{
+ let sql = "SELECT realtors.*,users.first_name,users.last_name,users.email FROM realtors INNER JOIN users ON realtors.user_id = users.id where realtors.approved= 0"
+  conn.query(sql, function (err, data, fields) {
+    if (err) return next(new AppError(err));
+    res.status(200).json({
+      status: "success",
+      length: data?.length,
+      data: data,
+    });
+  });
+ 
+}
